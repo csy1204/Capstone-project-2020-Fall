@@ -8,4 +8,3 @@ file_data["age"] = 26
 file_data["major"] = "Mathematics/Computer Engineering"
 
 print(json.dumps(file_data, ensure_ascii=False, indent="\t"))
-
