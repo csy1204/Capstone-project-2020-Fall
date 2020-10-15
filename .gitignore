@@ -1,4 +1,14 @@
+<<<<<<< HEAD
 data/*
+=======
+data/*.csv
+data/*.tsv
+data/*.json
+
+**/*.ipynb
+**/**/*.ipynb
+*/**/*.ipynb
+>>>>>>> ae1a44c306d9fb118a6193082cfa107d65fcf7ec
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
