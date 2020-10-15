@@ -2,9 +2,9 @@ data/*.csv
 data/*.tsv
 data/*.json
 
-**/*.ipynb
-**/**/*.ipynb
-*/**/*.ipynb
+# **/*.ipynb
+# **/**/*.ipynb
+# */**/*.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
