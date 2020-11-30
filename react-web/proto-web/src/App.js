@@ -5,6 +5,7 @@ import React, {useEffect, useState} from "react";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import * as ReactBootstrap from "react-bootstrap";
+import api from './api.js'
 
 const filter = createFilterOptions();
 
@@ -15,20 +16,7 @@ const App = () => {
   // const [query, setQuery] = useState('성탄절');
 
   const [value, setValue] = React.useState(null);
-  const playlist = [
-    {songname: "2002", singer: "Anne Marie"},
-    {songname: "Dynamite", singer: "BTS"},
-    {songname: "Snowman", singer: "Sia"},
-  ]
-
-  const renderPlaylist = (recommendation, index) => {
-    return(
-      <tr key={index}>
-        <td>{recommendation.songname}</td>
-        <td>{recommendation.singer}</td>
-      </tr>
-    )
-  }
+  const [data, setData] = React.useState([]);
 
   // useEffect(() => {
   //   getSongs();
@@ -54,10 +42,35 @@ const App = () => {
   // }
 
 
+
+  const playlist = [
+    {songname: "2002", singer: "Anne Marie"},
+    {songname: "Dynamite", singer: "BTS"},
+    {songname: "Snowman", singer: "Sia"},
+  ]
+
+  const handleClick = async (e) => {
+    e.preventDefault() 
+
+    const response = await api.getInference({tag: value.title })
+    console.log(response)
+
+    const recommendations = response.map((album) => {
+      return {
+        songname: album.userId,
+        singer: album.title
+      }
+    })
+    
+    setData(recommendations)
+  }
+
+
   return (
     <div className="App">
       <div className="header">
         <div id="Sung-Ply">Sung-Ply</div>
+
         <form className="search-form">
           {/* <input className="search-bar" type="text" value={search} onChange={updateSearch}/>          */}
           <Autocomplete
@@ -114,24 +127,63 @@ const App = () => {
               <TextField {...params} label="태그를 입력하세요" variant="outlined" />
             )}
           />
-          <button className="search-button" type="submit">음악 추천</button>
+          <button className="search-button" onClick={handleClick}>음악 추천</button>
         </form>
       </div>
       
-      <div classname="playlist">
-      <ReactBootstrap.Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Artist</th>
-          </tr>
-        </thead>
-        <tbody>
-          {playlist.map(renderPlaylist)}
-        </tbody>
-      </ReactBootstrap.Table>
+      <div className={"playlist"}>
+        <ReactBootstrap.Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Artist</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((recommendation, index) => (
+              <tr key={index}>
+                <td>{recommendation.songname}</td>
+                <td>{recommendation.singer}</td>
+              </tr>
+            ))
+          }
+          </tbody>
+        </ReactBootstrap.Table>
+        <ReactBootstrap.Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Artist</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((recommendation, index) => (
+              <tr key={index}>
+                <td>{recommendation.songname}</td>
+                <td>{recommendation.singer}</td>
+              </tr>
+            ))
+          }
+          </tbody>
+        </ReactBootstrap.Table>
+        <ReactBootstrap.Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Artist</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((recommendation, index) => (
+              <tr key={index}>
+                <td>{recommendation.songname}</td>
+                <td>{recommendation.singer}</td>
+              </tr>
+            ))
+          }
+          </tbody>
+        </ReactBootstrap.Table>
       </div>
-      
     </div>
   ); 
 }
