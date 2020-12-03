@@ -6,6 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import * as ReactBootstrap from "react-bootstrap";
 import api from './api.js'
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 
 const filter = createFilterOptions();
 
@@ -17,6 +19,7 @@ const App = () => {
 
   const [value, setValue] = React.useState(null);
   const [data, setData] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   // useEffect(() => {
   //   getSongs();
@@ -51,18 +54,14 @@ const App = () => {
 
   const handleClick = async (e) => {
     e.preventDefault() 
+    console.log("Clcik!")
+    setIsLoading(true)
 
-    const response = await api.getInference({tag: value.title })
-    console.log(response)
+    const inferences = await api.getInference({tag: value.title })
+    console.log(inferences)
 
-    const recommendations = response.map((album) => {
-      return {
-        songname: album.userId,
-        singer: album.title
-      }
-    })
-    
-    setData(recommendations)
+    setData(inferences)
+    setIsLoading(false)
   }
 
 
@@ -127,7 +126,11 @@ const App = () => {
               <TextField {...params} label="태그를 입력하세요" variant="outlined" />
             )}
           />
-          <button className="search-button" onClick={handleClick}>음악 추천</button>
+          <button disabled={isLoading} className="search-button" onClick={handleClick}>
+            {isLoading ?
+               <> {"로딩 중 "} <CircularProgress size={10} thickness={1.5} /></>: "음악 추천"
+            }
+          </button>
         </form>
       </div>
       

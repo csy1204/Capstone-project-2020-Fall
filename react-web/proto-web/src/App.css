@@ -44,6 +44,7 @@
   border-image:linear-gradient(to right, #00cc00 0%, #01c9ca 100%);
   border-image-slice: 1;
   border-style: solid;
+  
   cursor: pointer;
 }
 
