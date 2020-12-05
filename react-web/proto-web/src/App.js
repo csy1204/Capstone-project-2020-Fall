@@ -13,37 +13,13 @@ const filter = createFilterOptions();
 
 const App = () => {
 
-  // const [songs, setSongs] = useState([]);
-  // const [search, setSearch] = useState("");
-  // const [query, setQuery] = useState('성탄절');
-
   const [value, setValue] = React.useState(null);
   const [data, setData] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  // const [time, setTime] = React.useState(null);
 
-  // useEffect(() => {
-  //   getSongs();
-  // }, []); // [query]);
 
-  // const getSongs = async () => {
-  //   const response = await fetch(
-  //     // ??? 
-  //   );
-  //   const data = await response.json();
-  //   setSongs(data.hits);
-  //   console.log(data.hits);
-  // };
-
-  // const updateSearch = e => {
-  //     setSearch(e.target.value);
-  //     console.log(search);
-  // }
-
-  // const getSearch = e => {
-  //   e.preventDefault();
-  //   setQuery(search);
-  // }
-
+  var time = 63.56789;
 
 
   const playlist = [
@@ -57,10 +33,15 @@ const App = () => {
     console.log("Clcik!")
     setIsLoading(true)
 
-    const inferences = await api.getInference({tag: value.title })
-    console.log(inferences)
+    if (value.title == ""){
+      alert("태그를 입력하세요.") //질문 ***
+    }
+    else{
+      const inferences = await api.getInference({tag: value.title })
+      console.log(inferences)
 
-    setData(inferences)
+      setData(inferences)
+    }    
     setIsLoading(false)
   }
 
@@ -71,7 +52,6 @@ const App = () => {
         <div id="Sung-Ply">Sung-Ply</div>
 
         <form className="search-form">
-          {/* <input className="search-bar" type="text" value={search} onChange={updateSearch}/>          */}
           <Autocomplete
             className="autocomplete-search"
             value={value}
@@ -135,57 +115,75 @@ const App = () => {
       </div>
       
       <div className={"playlist"}>
-        <ReactBootstrap.Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Artist</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((recommendation, index) => (
-              <tr key={index}>
-                <td>{recommendation.songname}</td>
-                <td>{recommendation.singer}</td>
+        <div id="LB_NeuralCF">
+          <div className="table_title">
+            <h3 id="h3_color">Load Balanced Neural CF (Target)</h3>
+            <p id="infer_time">Inference time: {time.toFixed(2)}</p>
+          </div>
+          <ReactBootstrap.Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Artist</th>
               </tr>
-            ))
-          }
-          </tbody>
-        </ReactBootstrap.Table>
-        <ReactBootstrap.Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Artist</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((recommendation, index) => (
-              <tr key={index}>
-                <td>{recommendation.songname}</td>
-                <td>{recommendation.singer}</td>
+            </thead>
+            <tbody>
+              {data.map((recommendation, index) => (
+                <tr key={index}>
+                  <td>{recommendation.songname}</td>
+                  <td>{recommendation.singer}</td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </ReactBootstrap.Table>
+        </div>
+        <div id="Total_NeuralCF">
+          <div className="table_title">
+            <h3 id="h3_color">Original Neural CF (Baseline 1)</h3>
+            <p id="infer_time">Inference time: {time.toFixed(2)}</p>
+          </div>
+          <ReactBootstrap.Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Artist</th>
               </tr>
-            ))
-          }
-          </tbody>
-        </ReactBootstrap.Table>
-        <ReactBootstrap.Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Artist</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((recommendation, index) => (
-              <tr key={index}>
-                <td>{recommendation.songname}</td>
-                <td>{recommendation.singer}</td>
+            </thead>
+            <tbody>
+              {data.map((recommendation, index) => (
+                <tr key={index}>
+                  <td>{recommendation.songname}</td>
+                  <td>{recommendation.singer}</td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </ReactBootstrap.Table>
+        </div>
+        <div id="Total_SVD">
+          <div className="table_title">
+            <h3 id="h3_color">SVD Latent Factor CF (Baseline 2)</h3>
+            <p id="infer_time">Inference time: {time.toFixed(2)}</p>
+          </div>
+          <ReactBootstrap.Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Artist</th>
               </tr>
-            ))
-          }
-          </tbody>
-        </ReactBootstrap.Table>
+            </thead>
+            <tbody>
+              {data.map((recommendation, index) => (
+                <tr key={index}>
+                  <td>{recommendation.songname}</td>
+                  <td>{recommendation.singer}</td>
+                </tr>
+              ))
+            }
+            </tbody>
+          </ReactBootstrap.Table>
+        </div>
       </div>
     </div>
   ); 
