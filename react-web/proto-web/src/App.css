@@ -1,0 +1,82 @@
+.App {
+  min-height: 100vh;
+}
+
+.header {
+  width: 100%;
+  height: 390px;
+  background: linear-gradient(to right, #00cc55fd 0%, #01c9ca 100%);
+}
+
+#Sung-Ply {
+  padding-top: 60px;
+  text-align: center;
+  font-size: 110px;
+  color: #fff;
+}
+
+.search-form {
+  margin-top: 50px;
+  min-height: 10vh;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+}
+
+.search-bar  {
+  width: 50%;
+  border-style: solid;
+  font-size: larger;
+  border-width: 5px;
+  border-color: #fff;
+  box-shadow: 1px 3px 5px #808080;
+  border-radius: 30px;
+  padding: 20px;
+}
+
+.search-button{
+  margin-left: 20px;
+  padding: 15px 15px;
+  color: #00cc00;
+  font-size: 15px;
+  
+  background-color: white;
+  border-image:linear-gradient(to right, #00cc00 0%, #01c9ca 100%);
+  border-image-slice: 1;
+  border-style: solid;
+  
+  cursor: pointer;
+}
+
+.playlist{
+  display: flex;
+  margin: 0 50px;
+  gap: 10px;
+  justify-content: center;
+}
+
+.table_title{
+  margin: 40px 5px;
+}
+
+#h3_color{
+  color: #01a0a5;
+}
+
+#infer_time{
+  margin: 20px 5px;
+  font-size: 15px;
+  color: #282b2b;
+}
+
+#LB_NeuralCF{
+  width: 32%;
+}
+
+#Total_NeuralCF{
+  width: 32%;
+}
+
+#Total_SVD{
+  width: 32%;
+}
