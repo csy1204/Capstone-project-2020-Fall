@@ -1,44 +1,45 @@
-import logo from './logo.svg';
 import './App.css';
-import Song from './Song';
-import React, {useEffect, useState} from "react";
+import React from "react";
 import TextField from '@material-ui/core/TextField';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import * as ReactBootstrap from "react-bootstrap";
 import api from './api.js'
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-
 const filter = createFilterOptions();
 
 const App = () => {
 
   const [value, setValue] = React.useState(null);
-  const [data, setData] = React.useState([]);
+
+  const [clusterData, setClusterData] = React.useState([]);
+  const [allData, setAllData] = React.useState([]);
+  const [svdData, setSvdData] = React.useState([]);
+  
+  const [spentData, setSpentData] = React.useState([0.0, 0.0, 0.0]);
   const [isLoading, setIsLoading] = React.useState(false);
-  // const [time, setTime] = React.useState(null);
-
-  var time = 63.56789;
-
-  // const playlist = [
-  //   {songname: "2002", singer: "Anne Marie"},
-  //   {songname: "Dynamite", singer: "BTS"},
-  //   {songname: "Snowman", singer: "Sia"},
-  // ]
 
   const handleClick = async (e) => {
     e.preventDefault() 
-    console.log("Clcik!")
     setIsLoading(true)
 
-    if (value == ""){
+    if (!value){
+      setIsLoading(false)
       alert("태그를 입력하세요.") //질문 ***
+      return
     }
-    else{
-      const inferences = await api.getInference({tag: value.title })
-      console.log(inferences)
-      setData(inferences)
-    }    
+
+    const inferences = await api.getInference({tag: value.title })
+    if (inferences.total_length == 0) {
+      setIsLoading(false)
+      alert("존재하지 않는 태그입니다. 다시 입력해주세요~ :)")
+      return
+    }
+
+    setClusterData(inferences.cluster_model.predictions)
+    setAllData(inferences.all_model.predictions)
+    setSvdData(inferences.svd_model.predictions)
+    setSpentData([inferences.cluster_model.spent, inferences.all_model.spent, inferences.svd_model.spent])
     setIsLoading(false)
   }
 
@@ -115,7 +116,7 @@ const App = () => {
         <div id="LB_NeuralCF">
           <div className="table_title">
             <h3 id="h3_color">Load Balanced Neural CF (Target)</h3>
-            <p id="infer_time">Inference time: {time.toFixed(2)}</p>
+            <p id="infer_time">Inference time: {spentData[0].toFixed(2)}</p>
           </div>
           <ReactBootstrap.Table striped bordered hover>
             <thead>
@@ -125,7 +126,7 @@ const App = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((recommendation, index) => (
+              {clusterData.map((recommendation, index) => (
                 <tr key={index}>
                   <td>{recommendation.songname}</td>
                   <td>{recommendation.singer}</td>
@@ -138,7 +139,7 @@ const App = () => {
         <div id="Total_NeuralCF">
           <div className="table_title">
             <h3 id="h3_color">Original Neural CF (Baseline 1)</h3>
-            <p id="infer_time">Inference time: {time.toFixed(2)}</p>
+            <p id="infer_time">Inference time: {spentData[1].toFixed(2)}</p>
           </div>
           <ReactBootstrap.Table striped bordered hover>
             <thead>
@@ -148,7 +149,7 @@ const App = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((recommendation, index) => (
+              {allData.map((recommendation, index) => (
                 <tr key={index}>
                   <td>{recommendation.songname}</td>
                   <td>{recommendation.singer}</td>
@@ -161,7 +162,7 @@ const App = () => {
         <div id="Total_SVD">
           <div className="table_title">
             <h3 id="h3_color">SVD Latent Factor CF (Baseline 2)</h3>
-            <p id="infer_time">Inference time: {time.toFixed(2)}</p>
+            <p id="infer_time">Inference time: {spentData[2].toFixed(2)}</p>
           </div>
           <ReactBootstrap.Table striped bordered hover>
             <thead>
@@ -171,7 +172,7 @@ const App = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((recommendation, index) => (
+              {svdData.map((recommendation, index) => (
                 <tr key={index}>
                   <td>{recommendation.songname}</td>
                   <td>{recommendation.singer}</td>
@@ -186,80 +187,48 @@ const App = () => {
   ); 
 }
 
-const top100Films = [
-  { title: '연애'},  { title: '유재석'},  { title: '포근한'},  { title: '연말'},  { title: '짝사랑'}, 
-  { title: '친구'},  { title: '운전'},  { title: '봄바람'},  { title: '호텔'},  { title: '잠들기전'}, 
-  { title: '러브송'},  { title: '흥겨운'},  { title: '산책'},  { title: '듣기좋은'},  { title: '걸그룹'}, 
-  { title: '요가'},  { title: '드라이빙'},  { title: '안녕'},  { title: '파티'},  { title: '비오는날'}, 
-  { title: '추위'},  { title: '감미로운'},  { title: '재즈'},  { title: '기억'},  { title: '이브'}, 
-  { title: 'UK'},  { title: '추억회상'},  { title: '여행'},  { title: '가을밤'},  { title: '센치한'}, 
-  { title: '최신'},  { title: '배경음악'},  { title: '추석'},  { title: '피트니스'},  { title: '추억'}, 
-  { title: '집'},  { title: '남자'},  { title: '살랑살랑'},  { title: '어쿠스틱'},  { title: '감성곡'}, 
-  { title: '드라이브'},  { title: '고속도로'},  { title: '신나는'},  { title: '가을비'},  { title: '눈'}, 
-  { title: '불금'},  { title: '피아노'},  { title: '연주'},  { title: '성인가요'},  { title: '댄스'}, 
-  { title: '주말'},  { title: '패션'},  { title: '우울한'},  { title: '벚꽃'},  { title: '날씨'}, 
-  { title: '커피'},  { title: '노동요'},  { title: '경쾌한'},  { title: '나만의Best3'},  { title: '정미애'}, 
-  { title: '노래'},  { title: '헤어짐'},  { title: '팝'},  { title: '댄스곡'},  { title: '심쿵'}, 
-  { title: '여유'},  { title: '휴식'},  { title: '아기'},  { title: '새벽'},  { title: 'SWAG'}, 
-  { title: '우울'},  { title: '침대'},  { title: '12월'},  { title: '뉴에이지'},  { title: '낭만적인'}, 
-  { title: '론뮤직'},  { title: '공부할때'},  { title: '우울할때'},  { title: '명절'},  { title: '2019년'}, 
-  { title: '중독성'},  { title: '엄마아리랑'},  { title: '인디'},  { title: 'DJ'},  { title: '비'}, 
-  { title: '자장가'},  { title: '버스'},  { title: '스타일'},  { title: '까페'},  { title: '퇴근'}, 
-  { title: '핫한'},  { title: '상큼한'},  { title: '노래방'},  { title: '상큼'},  { title: 'EDM'}, 
-  { title: '오디오'},  { title: '혼자'},  { title: '기분전환'},  { title: 'cafe'},  { title: '감성자극'}, 
-  { title: '휴양지'},  { title: '아이돌'},  { title: '부드러운'},  { title: '눈오는날'},  { title: '아련한'}, 
-  { title: '여름노래'},  { title: '댄스댄스'},  { title: 'electronica'},  { title: '연휴'},  { title: '가을'}, 
-  { title: '알앤비'},  { title: '토닥토닥'},  { title: '장마'},  { title: '가을감성'},  { title: '트렌디'}, 
-  { title: '꿀잠'},  { title: '내마음의사진'},  { title: '과거'},  { title: '잔잔'},  { title: '하우스'}, 
-  { title: '와인'},  { title: '고백'},  { title: '신남'},  { title: '봄노래'},  { title: '쓸쓸'}, 
-  { title: '데이식스'},  { title: '느낌있는'},  { title: '성탄절'},  { title: '불면증'},  { title: '전곡듣기'}, 
-  { title: '월드'},  { title: '귀성길'},  { title: '최애곡'},  { title: '디스코'},  { title: '달달'}, 
-  { title: '소울'},  { title: '책읽을때'},  { title: '슬픔'},  { title: '운동'},  { title: '사랑노래'}, 
-  { title: '락'},  { title: '잔잔한노래'},  { title: '첫눈'},  { title: '여름밤'},  { title: '쌀쌀한'}, 
-  { title: '시원한'},  { title: '저녁'},  { title: '낮잠'},  { title: '일렉'},  { title: '캐롤'}, 
-  { title: '수고'},  { title: 'kpop'},  { title: '방콕'},  { title: '혼자있을때'},  { title: '메리크리스마스'}, 
-  { title: '기분좋은'},  { title: '포크'},  { title: '빌로우'},  { title: '아무로나미에'},  { title: '꽃'}, 
-  { title: '월요병'},  { title: '분위기'},  { title: '청량'},  { title: '페스티벌'},  { title: '추천곡'}, 
-  { title: '내적댄스'},  { title: '외로움'},  { title: '클럽'},  { title: '즐거운'},  { title: '맑은'}, 
-  { title: '스포츠'},  { title: '미스터트롯'},  { title: '열대야'},  { title: '오르골'},  { title: '감성발라드'}, 
-  { title: '밤'},  { title: '시작'},  { title: '브릿팝'},  { title: 'EDMFloor'},  { title: '빗소리'}, 
-  { title: '트렌드'},  { title: '조용한'},  { title: '낙엽'},  { title: '겨울밤'},  { title: 'RnB'}, 
-  { title: '2019'},  { title: '몽환'},  { title: '블랙뮤직'},  { title: '겨울노래'},  { title: '겨울'}, 
-  { title: '휴일'},  { title: '태교'},  { title: '팝송'},  { title: '새벽감성'},  { title: '소나기'}, 
-  { title: '그리움'},  { title: '공감'},  { title: 'dance'},  { title: '달달한'},  { title: '신나는노래'}, 
-  { title: '하늘'},  { title: '그루브'},  { title: '봄'},  { title: '퓨전재즈'},  { title: '회식'}, 
-  { title: '일렉트로니카'},  { title: '잔잔한'},  { title: '힙합엘이'},  { title: '이어폰'},  { title: '힘들때'}, 
-  { title: '설렘'},  { title: '취향저격'},  { title: '독서'},  { title: '명상'},  { title: '썸'}, 
-  { title: '목소리'},  { title: 'TOP20'},  { title: '내한'},  { title: '랩'},  { title: '더위'}, 
-  { title: '송가인'},  { title: 'Official_Chart'},  { title: '따듯한'},  { title: '띵곡들'},  { title: '파워풀'}, 
-  { title: '베스트'},  { title: '연주곡'},  { title: '셋리스트'},  { title: '감성'},  { title: '엄마'}, 
-  { title: '재즈힙합'},  { title: '바람'},  { title: '헬스'},  { title: '운동할때'},  { title: '동요'}, 
-  { title: '흐린날'},  { title: '감성적인'},  { title: '명곡'},  { title: '감성충전'},  { title: '임영웅'}, 
-  { title: '집콕'},  { title: '홍자'},  { title: '별'},  { title: '커피숍'},  { title: 'pub'}, 
-  { title: '크리스마스'},  { title: '바다'},  { title: '기분업'},  { title: '안전운전'},  { title: '봄캐롤'}, 
-  { title: '추억의'},  { title: '흥폭발'},  { title: '겨울감성'},  { title: '도시'},  { title: '어린이집'}, 
-  { title: '숨은명곡'},  { title: '모닝콜'},  { title: '꿀맛'},  { title: '화창한'},  { title: '라운지'}, 
-  { title: '2000'},  { title: '휴가'},  { title: 'bgm'},  { title: '여름휴가'},  { title: '연인'}, 
-  { title: '비오는날듣기좋은노래'},  { title: '하루'},  { title: '슬픈'},  { title: '헬스장'},  { title: 'Pop'}, 
-  { title: '집중'},  { title: '눈물'},  { title: '아침'},  { title: '두근두근'},  { title: '즐거움'}, 
-  { title: 'Rock'},  { title: '차분한'},  { title: '출근길'},  { title: '이별'},  { title: '계절'}, 
-  { title: '스트레스'},  { title: '봄날'},  { title: '잠'},  { title: '피크닉'},  { title: '음색'}, 
-  { title: '달콤'},  { title: 'OST모음'},  { title: '다이어트'},  { title: '추운날'},  { title: '띵곡'}, 
-  { title: '알엔비'},  { title: '콘서트'},  { title: '오후'},  { title: '시험'},  { title: '트롯'}, 
-  { title: ' 숙면 '},  { title: ' HOT '},  { title: ' 회상 '},  { title: ' 우산 '},  { title: ' 대세 '}, 
-  { title: '싱어송라이터'},  { title: '캐럴'},  { title: '취저 '},  { title: '신나는_음악'},  { title: '꿀성대'}, 
-  { title: '흥'},  { title: '설레임'},  { title: '힙합'},  { title: '애창곡'},  { title: '이별노래'}, 
-  { title: '카페'},  { title: '매장'},  { title: '음색깡패'},  { title: '크리스마스노래'},  { title: '여자'}, 
-  { title: '스웩'},  { title: '1990'},  { title: '미스트롯'},  { title: '2010'},  { title: '퇴근길'}, 
-  { title: '잠잘때'},  { title: '공부'},  { title: '설날'},  { title: '쓸쓸한'},  { title: '감각적인'}, 
-  { title: '연주음악'},  { title: '달콤한'},  { title: '주제곡'},  { title: '사랑'},  { title: 'HIPHOPLE'}, 
-  { title: '발라드'},  { title: '생각'},  { title: '여름'},  { title: '힐링'},  { title: '여자아이돌'}, 
-  { title: '방탄'},  { title: '센치'},  { title: '커플'},  { title: '첫사랑'},  { title: '지하철'}, 
-  { title: '위로'},  { title: '매장음악'},  { title: '좋은노래'},  { title: '가사'},  { title: '데이트'}, 
-  { title: 'Acoustic'},  { title: '유산소'},  { title: '솔로'},  { title: '세련된'},  { title: '비트'}, 
-  { title: '스타일리시'},  { title: '꿈'},  { title: '야경'},  { title: '편안한'},  { title: '일상'} 
+const input_tags = ['디즈니', '연애', '유재석', '고막남친', '포근한', '연말', '짝사랑', '운전', '봄바람',
+       '잠들기전', '힘', '흥겨운', '신곡', '산책', '듣기좋은', '걸그룹', '파티', '비오는날', '추위',
+       '비오는', '불토', '재즈', '이브', 'UK', '연애세포', '여행', '가을밤', '센치한', '록',
+       '행복', '배경음악', '감성힙합', '추석', '추억', '지친', '집', '어쿠스틱', '감성곡', '드라이브',
+       '고속도로', '신나는', '가을비', '트로트', '눈', '불금', '피아노', '발랄', '성인가요', '댄스',
+       '주말', '패션', '우울한', '벚꽃', '날씨', '커피', '노동요', '수록곡', '힘내', '경쾌한',
+       '정미애', '따뜻함', '노래', 'OfficialCharts', '헤어짐', '남자아이돌', '팝', '댄스곡',
+       '정다경', '여유', '휴식', '새벽', '잔잔함', '2000년대', '나른', '우울', '12월',
+       '뉴에이지', '우울할때', '명절', '2019년', '중독성', '엄마아리랑', '인디', '비', '자장가',
+       '버스', '스타일', '축하', '까페', '퇴근', '2016', '상큼한', '노래방', '찾아오는DJ',
+       'RNBSOUL', '상큼', '청량한', 'EDM', 'deep', '한국힙합', '아픔', '밝은', '혼자',
+       '기분전환', '찬양', '아이돌', '부드러운', '눈오는날', '귀르가즘', '여름노래', '댄스댄스', 'bar',
+       '크리스마스캐롤', '테라스', 'electronica', '연휴', '봄비', '가을', '북카페', '알앤비',
+       '토닥토닥', '장마', '트렌디', '꿀잠', '잔잔', '하우스', '와인', '생일', '국외', '고백',
+       '신남', '봄노래', '쓸쓸', '얼터너티브', '느낌있는', '성탄절', '브금', '불면증', '귀성길',
+       '에이핑크', '디스코', '인기', '달달', '소울', '책읽을때', '슬픔', '운동', '사랑노래', '락',
+       '잔잔한노래', '여름밤', '쌀쌀한', '시원한', '저녁', '낮잠', '일렉', '캐롤', '방콕',
+       '메리크리스마스', '기분좋은', '따뜻하게', '빌로우', '아무로나미에', '장르구분없이', '월요병', '분위기',
+       '청량', '페스티벌', '추천곡', '내적댄스', '국힙', '외로움', '클럽', '즐거운', '맑은', '스포츠',
+       '열대야', '오르골', '감성발라드', '밤', '시작', '브릿팝', '산뜻한', 'EDMFloor', '빗소리',
+       '쓸쓸함', '조용한', '낙엽', '겨울밤', '좋아요', '2019', '몽환', '블랙뮤직', '겨울노래',
+       '겨울', '휴일', '태교', '팝송', '새벽감성', '바캉스', '그리움', '추천', 'Lounge',
+       '플레이리스트', 'dance', '달달한', '신나는노래', '하늘', 'Instrumental', '그루브',
+       '치유', '봄', '퓨전재즈', '회식', '일렉트로니카', '잔잔한', '힙합엘이', '힙한', '힘들때',
+       '설렘', '취향저격', '독서', '썸', '차분', '목소리', '마음', '내한', '랩', '더위', '따듯한',
+       '띵곡들', '베스트', '봄나들이', '인디팝', '연주곡', '셋리스트', '감성', '장윤정', '후회',
+       '바람', '헬스', '지칠때', '흐린날', '감성적인', '유산슬', '임영웅', '집콕', '에너지',
+       '몽환적인', 'Christmas', '해외일렉트로니카', '크리스마스', '바다', '케이팝', '기분업',
+       '흥폭발', '겨울감성', '어린이집', '숨은명곡', 'OST', '2000', '고막여친', '춤', '휴가',
+       'bgm', '트랩', '연인', '비오는날듣기좋은노래', '하루', '가족', '슬픈', 'Pop', '집중',
+       '눈물', '아침', '카페뮤직', '두근두근', 'Rock', '차분한', '출근길', '이별', 'house',
+       '기분', '스트레스', '봄날', '잠', 'ballad', '음색', '달콤', '인디음악', '기타',
+       '다이어트', '띵곡', '떼창', '오후', '시험', '숙면', '회상', '대세', '캐럴', '취저',
+       '달달한노래', '꿀성대', '희망', '팝송모음', '흥', '설레임', '힙합', '애창곡', '카페', '매장',
+       '음색깡패', '크리스마스노래', '스웩', '오늘', '음악', '1990', '신나는음악', '유니크', '퇴근길',
+       '신나', '잠잘때', '공부', '설날', '힘이_나는', '달콤한', '주제곡', '사랑', '발라드', '생각',
+       '여름', '힐링', '여자아이돌', '방탄', '센치', '고백송', '커플', '첫사랑', '조깅', '지하철',
+       '위로', '매장음악', '좋은노래', '가사', '데이트', '유산소', '트로피컬', '리드미컬', '솔로',
+       '세련된', '비트', '스타일리시', '야경', '나들이', '편안한', '휘트니스', '영국', '일상'
+]
 
-];
+const top100Films = input_tags.map((tag_name) => ({title: tag_name}))
 
 
 export default App;

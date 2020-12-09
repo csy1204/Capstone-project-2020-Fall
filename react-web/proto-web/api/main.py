@@ -23,7 +23,7 @@ def write_data_to_pickle(data, path):
         f.write(pickle.dumps(data))
 
 def get_path(filename, parent='__models__'):
-    return os.path.join('..', '..', parent, filename)
+    return os.path.join('..', parent, filename)
 
 tag_vectors = get_data_from_pickle(get_path('tag_vectors', parent='__const__'))
 cluster_centers = get_data_from_pickle(get_path('kmeans15.cluster_centers_.pickle', parent='__const__'))
@@ -31,12 +31,11 @@ unique_tag_list = get_data_from_pickle(get_path('unique_tag_list.pickle', parent
 tag_dict = get_data_from_pickle(get_path('tag_dict.pickle', parent='__const__'))
 songId2meta = get_data_from_pickle(get_path('songId2meta.pickle', parent='__const__'))
 
-
 tag2idx = {tag: i for i, tag in enumerate(unique_tag_list)}
 idx2tag = {i: tag for i, tag in enumerate(unique_tag_list)}
 
 ################################
-# Load Balancing
+# Load Balancing Algorithms
 ################################
 
 import math
@@ -103,6 +102,11 @@ CLUSTER_ID_TRANSFORMER = [
     for i in range(15)
 ]
 
+
+################################
+# Recommendation
+################################
+
 def get_recommendations(tag_id, new_model, id_transformer, k=50):
     _max_song_len = len(id_transformer)
     tags_input = np.array([tag_id] * _max_song_len).reshape(-1, 1)
@@ -112,6 +116,10 @@ def get_recommendations(tag_id, new_model, id_transformer, k=50):
     predicted = predicted.argsort()[-k:][::-1]
     
     return [id_transformer.get(new_id) for new_id in predicted]
+
+################################
+# Map Reduce
+################################
 
 def map_reduce_recommendations(_tag_input):
     _tag_id = tag2idx.get(_tag_input)
@@ -126,7 +134,6 @@ def map_reduce_recommendations(_tag_input):
 # Load Result
 ################################
 
-
 all_model_results = get_data_from_pickle(get_path('all_model_results.pickle', parent='__const__'))
 svd_results = get_data_from_pickle(get_path('svd_results.pickle', parent='__const__'))
 
@@ -137,6 +144,7 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:3000",
+    "http://49.50.162.241:3000"
 ]
 
 app.add_middleware(
@@ -146,13 +154,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-predicted_mock = [
-    {"songname": "2002", "singer": "Anne Marie"},
-    {"songname": "Dynamite", "singer": "BTS"},
-    {"songname": "Snowman", "singer": "Sia"},
-]
 
 @app.get("/")
 async def root():
@@ -199,4 +200,4 @@ def read_item(tag_name):
 
 if __name__ == "__main__":
     # print(map_reduce_recommendations('고막남친'))
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host='0.0.0.0', port=8000)
