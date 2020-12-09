@@ -18,28 +18,25 @@ const App = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   // const [time, setTime] = React.useState(null);
 
-
   var time = 63.56789;
 
-
-  const playlist = [
-    {songname: "2002", singer: "Anne Marie"},
-    {songname: "Dynamite", singer: "BTS"},
-    {songname: "Snowman", singer: "Sia"},
-  ]
+  // const playlist = [
+  //   {songname: "2002", singer: "Anne Marie"},
+  //   {songname: "Dynamite", singer: "BTS"},
+  //   {songname: "Snowman", singer: "Sia"},
+  // ]
 
   const handleClick = async (e) => {
     e.preventDefault() 
     console.log("Clcik!")
     setIsLoading(true)
 
-    if (value.title == ""){
+    if (value == ""){
       alert("태그를 입력하세요.") //질문 ***
     }
     else{
       const inferences = await api.getInference({tag: value.title })
       console.log(inferences)
-
       setData(inferences)
     }    
     setIsLoading(false)

@@ -2,6 +2,11 @@ data/*.csv
 data/*.tsv
 data/*.json
 
+**/**/.DS_Store
+*/.DS_Store
+__models__/*
+__const__/*
+
 # **/*.ipynb
 # **/**/*.ipynb
 # */**/*.ipynb
