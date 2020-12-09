@@ -4,8 +4,8 @@ data/*.json
 
 **/**/.DS_Store
 */.DS_Store
-__models__/*
-__const__/*
+__models__/all_*
+
 
 # **/*.ipynb
 # **/**/*.ipynb
