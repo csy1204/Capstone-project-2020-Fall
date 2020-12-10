@@ -1,4 +1,29 @@
-# Capstone-project-2020-Fall
+# Sungply :: Capstone-project-2020-Fall
+
+## Env
+
+```
+python 3.8
+Node v12
+```
+## Web Demo
+
+http://49.50.162.241:3000/
+
+
+## Result
+
+### Latency
+![image](https://user-images.githubusercontent.com/18041103/101727712-5bb7ba80-3af8-11eb-86be-003d90110204.png)
+
+### Recall
+![image](https://user-images.githubusercontent.com/18041103/101727721-62463200-3af8-11eb-84fe-ec28416fa0ff.png)
+
+### Precision
+![image](https://user-images.githubusercontent.com/18041103/101727737-6a05d680-3af8-11eb-83c1-be0693cbe069.png)
+
+
+
 
 
 ### Process
